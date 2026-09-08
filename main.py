@@ -400,7 +400,7 @@ def risk_analysis(df: pd.DataFrame, pa: dict[str,Any], groups: list[GroupScore])
     if conflicts: points+=12; factors.append("Kelompok indikator memberikan sinyal yang saling bertentangan.")
     if rv is not None and rv<0.5: points+=8; factors.append("Relative volume rendah sehingga kualitas likuiditas candle melemah.")
     score=float(np.clip(points,0,100)); level="Low" if score<25 else "Medium" if score<50 else "High" if score<75 else "Very High"
-    return score,level,factors,{"Historical volatility":hv,"ATR percentage":atrp,"Maximum drawdown":mdd,"Downside deviation":downside,"Average candle range":number(df.AvgRange20.iloc[-1]),"Distance to support":pa.get("distance_support"),"Distance to resistance":pa.get("distance_resistance"),"Risk-reward ratio":pa.get("risk_reward")}
+    return score,level,factors,{"Historical volatility":hv,"ATR percentage":atrp,"Maximum drawdown":mdd,"Downside deviation":downside,"Average candle range":number(df["AvgRange20%"].iloc[-1]),"Distance to support":pa.get("distance_support"),"Distance to resistance":pa.get("distance_resistance"),"Risk-reward ratio":pa.get("risk_reward")}
 
 
 def historical_rule_score(df: pd.DataFrame) -> pd.Series:
