@@ -479,7 +479,8 @@ def main() -> None:
         st.error(error or msg); st.error("Pengambilan data gagal. Tidak ada data dummy yang digunakan sebagai pengganti."); st.stop()
     df=compute_indicators(raw.dropna(subset=["Open","High","Low","Close"]).copy())
     info,fast,info_error=fetch_ticker_information(ticker)
-    fundamentals,statements,fund_error=fetch_fundamental_data(ticker)
+    # Gunakan payload info yang sama untuk menghindari request fundamental duplikat saat startup.
+    fundamentals, statements, fund_error = info, {}, ""
     bench_data=pd.DataFrame(); bench_error=""
     if benchmark:
         bench_data,bench_error,_=fetch_stock_data(benchmark,period,interval)
@@ -531,7 +532,7 @@ def main() -> None:
     with tabs[3]:
         fields={"Market Cap":fundamentals.get("marketCap"),"Trailing P/E":fundamentals.get("trailingPE"),"Forward P/E":fundamentals.get("forwardPE"),"Price-to-Book":fundamentals.get("priceToBook"),"Dividend Yield":fundamentals.get("dividendYield"),"EPS":fundamentals.get("trailingEps"),"Revenue":fundamentals.get("totalRevenue"),"Net Income":fundamentals.get("netIncomeToCommon"),"Operating Cash Flow":fundamentals.get("operatingCashflow"),"Free Cash Flow":fundamentals.get("freeCashflow"),"Total Debt":fundamentals.get("totalDebt"),"Total Equity":fundamentals.get("totalStockholderEquity"),"ROE":fundamentals.get("returnOnEquity"),"Profit Margin":fundamentals.get("profitMargins"),"Revenue Growth":fundamentals.get("revenueGrowth"),"Earnings Growth":fundamentals.get("earningsGrowth")}
         st.dataframe(pd.DataFrame([fields]).T.rename(columns={0:"Actual Value"}),use_container_width=True)
-        st.caption(f"Financial statement sets available: {', '.join(statements.keys()) if statements else 'N/A'}. Fundamental dapat memiliki tanggal laporan berbeda dari candle terakhir.")
+        st.caption("Fundamental dimuat dari payload ticker aktual. Laporan keuangan lengkap tidak diambil saat startup agar aplikasi lebih ringan. Fundamental dapat memiliki tanggal laporan berbeda dari candle terakhir.")
     positive=[r["Interpretation"] for g in groups for r in g.reasons if r["Raw Score"]>0]
     with tabs[4]:
         if positive:
